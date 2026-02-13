@@ -39,6 +39,7 @@ A full-stack FuelEU Maritime compliance simulation platform built with:
 
 ## 🏗 Architecture
 This project follows a layered clean architecture:
+```yaml
 backend/
 ├── core/
 │ ├── domain/
@@ -47,7 +48,7 @@ backend/
 ├── adapters/
 │ ├── inbound/http/
 │ └── outbound/postgres/
-
+```
 - Domain contains pure business logic
 - Application contains use cases
 - Adapters connect HTTP and PostgreSQL
