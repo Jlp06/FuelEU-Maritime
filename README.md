@@ -35,27 +35,177 @@ This project demonstrates clean architecture principles, domain-driven design, a
 
 ## 🏗 Architecture
 
-This project follows Clean Architecture to separate business logic from infrastructure.
+This project follows a Clean Architecture pattern to separate business logic from infrastructure and UI.
 
-```yaml
+The system is divided into four main layers:
+```scss
+Frontend (React)
+    ↓
+HTTP Controllers (Express)
+    ↓
+Application Layer (Use Cases)
+    ↓
+Domain Layer (Business Logic)
+    ↓
+Infrastructure Layer (PostgreSQL Repositories)
+```
+
+### Backend Structure
+
+```bash
 backend/
 │
 ├── core/
-│ ├── domain/ # Entities and business models
-│ ├── application/ # Use cases (ComputeComplianceBalance, CreatePool)
-│ └── ports/ # Repository interfaces
+│   ├── domain/
+│   │   ├── Route.ts
+│   │   ├── Comparison.ts
+│   │   └── Compliance.ts
+│   │
+│   ├── application/
+│   │   ├── ComputeComplianceBalance.ts
+│   │   ├── CompareRoutes.ts
+│   │   └── CreatePool.ts
+│   │
+│   └── ports/
+│       ├── RouteRepository.ts
+│       ├── BankRepository.ts
+│       └── ComplianceRepository.ts
 │
 ├── adapters/
-│ ├── inbound/http/ # Express controllers
-│ └── outbound/postgres/ # PostgreSQL repositories
-│
+│   ├── inbound/http/
+│   │   ├── routes.controller.ts
+│   │   ├── banking.controller.ts
+│   │   └── pools.controller.ts
+│   │
+│   └── outbound/postgres/
+│       ├── RouteRepositoryPg.ts
+│       ├── BankRepositoryPg.ts
+│       ├── ComplianceRepositoryPg.ts
+│       └── db.ts
+```
+
+### Frontend Structure
+
+```bash
 frontend/
 │
 ├── pages/
-├── components/
+│   ├── ComparePage.tsx
+│   ├── BankingPage.tsx
+│   └── PoolingPage.tsx
+│
 ├── infrastructure/
-|
+│   ├── BankingApiHttp.ts
+│   └── PoolApiHttp.ts
+│
+└── core/
+    ├── domain/
+    └── application/
 ```
+### Layer Responsibilities
+#### Domain Layer (core/domain)
+
+Contains business entities and models.
+
+Examples:
+
+- Route
+
+- Compliance Balance
+
+- Pool Member
+
+This layer contains no database or HTTP logic.
+
+#### Application Layer (core/application)
+
+Contains use cases implementing business logic.
+
+Examples:
+
+- ComputeComplianceBalance
+
+- CompareRoutes
+
+- CreatePool
+
+This layer orchestrates domain logic.
+
+#### Ports Layer (core/ports)
+
+Defines repository interfaces.
+
+Examples:
+
+- RouteRepository
+
+- BankRepository
+
+This allows infrastructure to be replaced without changing domain logic.
+
+#### Infrastructure Layer (adapters/outbound/postgres)
+
+Implements repository interfaces using PostgreSQL.
+
+Examples:
+
+- RouteRepositoryPg
+
+- BankRepositoryPg
+
+Handles database access.
+
+#### Inbound Layer (adapters/inbound/http)
+
+Handles HTTP requests using Express.
+
+Examples:
+
+- banking.controller.ts
+
+- pools.controller.ts
+
+Calls application use cases.
+
+#### Frontend Layer
+
+Provides UI and interacts with backend via REST API.
+
+Implements:
+
+- Comparison UI
+
+- Banking UI
+
+- Pooling UI
+
+Data Flow Example (Pooling)
+
+```bash
+React UI
+  ↓
+POST /pools
+  ↓
+pools.controller.ts
+  ↓
+CreatePool use case
+  ↓
+PoolRepositoryPg
+  ↓
+PostgreSQL
+```
+
+### Benefits of This Architecture
+
+Separation of concerns
+
+Testable business logic
+
+Maintainable structure
+
+Clear domain modeling
+
+Infrastructure independence
 
 ### Benefits of this approach
 
