@@ -1,222 +1,247 @@
-# FuelEU Maritime Compliance Platform – Backend
+# FuelEU Maritime Compliance Platform 🚢
 
-## Overview
+A full-stack FuelEU Maritime compliance simulation platform implementing compliance balance calculation, surplus banking, deficit application, and pooling redistribution based on regulatory methodology.
 
-This backend implements FuelEU Maritime compliance calculations according to Regulation (EU) 2023/1805 and the European Sustainable Shipping Forum (ESSF) WS1 FuelEU Calculation Methodologies document.
-
-The system calculates a ship’s compliance balance based on greenhouse gas (GHG) intensity, fuel consumption, and fuel-specific energy content using officially defined Annex II constants.
-
-It also implements FuelEU flexibility mechanisms including banking and pooling of compliance balance.
+This project demonstrates clean architecture principles, domain-driven design, and full-stack integration using React, Node.js, and PostgreSQL.
 
 ---
 
-## FuelEU Regulatory Background
+## ✨ Features
 
-FuelEU Maritime requires ships to maintain GHG intensity below defined regulatory targets. Compliance is evaluated annually based on the energy used onboard ships.
+### 📊 Route Comparison
+- Compare ship routes against yearly baseline
+- Compute GHG intensity differences
+- Visual comparison using charts
+- Sortable and structured comparison tables
 
-For reporting year 2025:
+### 💰 Compliance Balance (CB)
+- Calculate compliance balance per ship per year
+- Identify surplus or deficit status
+- Persist compliance data in PostgreSQL
 
-Target GHG intensity: 89.3368 gCO₂eq/MJ
+### 🏦 Banking System
+- Bank surplus compliance balance
+- Apply banked surplus to deficit ships
+- Prevent invalid applications
+- Track bank entries persistently
 
-Ships exceeding this threshold generate a compliance deficit, while ships below the threshold generate a compliance surplus.
-
----
-
-## Compliance Balance Calculation
-
-The compliance balance (CB) is calculated according to FuelEU Annex IV:
-
-CB = (Target GHG Intensity − Actual GHG Intensity) × Energy Used
-
-Where:
-
-Energy Used = Fuel Mass × Lower Calorific Value (LCV)
-
-Fuel mass is converted from tonnes to grams:
-
-Fuel Mass (g) = Fuel Mass (tonnes) × 1,000,000
-
-LCV values are retrieved from Annex II of the FuelEU regulation.
-
-Example:
-
-Fuel Type: HFO  
-Fuel Consumption: 100 tonnes  
-LCV: 0.0405 MJ/g  
-
-Energy = 100 × 1,000,000 × 0.0405 = 4,050,000 MJ
-
-Compliance Balance = (89.3368 − ActualIntensity) × 4,050,000
+### 🔁 Pooling System
+- Create compliance pools across ships
+- Redistribute surplus to cover deficits
+- Validate pool balance integrity
+- Visualize before and after redistribution
 
 ---
 
-## Flexibility Mechanisms Implemented
+## 🏗 Architecture
 
-### Banking
-
-Ships with surplus compliance balance may bank surplus for future reporting periods.
-
-Conditions:
-
-- Only positive compliance balance may be banked
-- Banked surplus can be applied to future deficits
-
-### Applying Banked Surplus
-
-Ships with compliance deficit may offset deficit using previously banked surplus.
-
-Conditions:
-
-- Cannot apply more surplus than available
-- Surplus reduces deficit proportionally
-
-### Pooling
-
-Multiple ships may pool compliance balance.
-
-Conditions:
-
-- Total pool compliance balance must be ≥ 0
-- Surplus ships offset deficit ships
-- No ship exits pooling with worse compliance balance
-
----
-
-## Architecture
-
-This backend follows Clean Architecture principles.
-
-Directory structure:
+This project follows Clean Architecture to separate business logic from infrastructure.
 
 ```yaml
 backend/
-src/
-core/
-application/
-domain/
-ports/
-adapters/
-inbound/http/
-outbound/postgres/
-infrastructure/
-db/
-server/
-shared/
-index.ts
+│
+├── core/
+│ ├── domain/ # Entities and business models
+│ ├── application/ # Use cases (ComputeComplianceBalance, CreatePool)
+│ └── ports/ # Repository interfaces
+│
+├── adapters/
+│ ├── inbound/http/ # Express controllers
+│ └── outbound/postgres/ # PostgreSQL repositories
+│
+frontend/
+│
+├── pages/
+├── components/
+├── infrastructure/
+|
 ```
 
-Layers:
+### Benefits of this approach
 
-Domain Layer  
-Contains core entities such as Route.
-
-Application Layer  
-Contains compliance calculation use cases.
-
-Adapters Layer  
-Handles HTTP requests and database interaction.
-
-Infrastructure Layer  
-Handles PostgreSQL connection and server setup.
-
-Shared Layer  
-Contains FuelEU constants including LCV values.
+- Testable business logic
+- Clear separation of concerns
+- Maintainable structure
+- Extensible design
 
 ---
 
-## Constants Used
+## 🛠 Tech Stack
 
-Fuel-specific Lower Calorific Values (MJ/g):
+### Frontend
+- React
+- TypeScript
+- TailwindCSS
+- Recharts
 
-HFO: 0.0405  
-LNG: 0.0491  
-Methanol: 0.0199  
-Hydrogen: 0.1200  
-Ammonia: 0.0186  
+### Backend
+- Node.js
+- Express.js
+- TypeScript
 
-Target GHG Intensity (2025):
-
-89.3368 gCO₂eq/MJ
-
-These values are sourced directly from FuelEU Annex II.
-
----
-
-## API Endpoints
-
-### Get Compliance Balance
-
-GET /compliance/cb?shipId=SHIP001&year=2025
-
-Response:
-
-{
-target: 89.3368,
-actual: 85.1,
-energyMJ: 4050000,
-cb: 17290800,
-status: "SURPLUS"
-}
-
-### Bank Surplus
-
-POST /banking/bank
-
-### Apply Banked Surplus
-
-POST /banking/apply
-
-### Get Bank Records
-
-GET /banking/records
+### Database
+- PostgreSQL
 
 ---
 
-## Installation
+## 📐 Core Business Logic
 
-Install dependencies:
+### Compliance Balance Calculation
+
+
+### Benefits of this approach
+
+- Testable business logic
+- Clear separation of concerns
+- Maintainable structure
+- Extensible design
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- React
+- TypeScript
+- TailwindCSS
+- Recharts
+
+### Backend
+- Node.js
+- Express.js
+- TypeScript
+
+### Database
+- PostgreSQL
+
+---
+
+## 📐 Core Business Logic
+
+### Compliance Balance Calculation
+
+CB = (Target GHG Intensity − Actual GHG Intensity) × Energy
+
+Where energy is derived from fuel consumption and regulatory conversion factors.
+
+### Banking Rules
+
+- Only surplus (positive CB) can be banked
+- Banked balance can be applied to deficits
+- Cannot apply more than available banked amount
+
+### Pooling Rules
+
+- Pool total CB must be ≥ 0
+- Surplus redistributed to cover deficits
+- Deficit ships cannot exit worse than before pooling
+
+---
+
+## 🚀 Setup Instructions
+
+### 1. Clone Repository
 
 ```bash
+git clone https://github.com/your-username/fueleu-compliance-platform.git
+cd fueleu-compliance-platform
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
 npm install
-```
----
-
-## Run development server
-```bash
 npm run dev
 ```
+Backend runs on:
 
----
+```arduino
+http://localhost:4000
 
-## Run tests
+```
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Frontend runs on:
+
+```arduino
+http://localhost:5173
+
+```
+
+### 4. Database Setup
+
+Create PostgreSQL database and required tables.
+
+Update database connection in:
+
+```swift
+backend/adapters/outbound/postgres/db.ts
+```
+
+## 🧪 Running Tests
+
+Backend:
 
 ```bash
 npm run test
 ```
 
----
+Frontend
 
-## Technologies Used
+```bash
+npm run test
+```
 
-Node.js  
-TypeScript  
-Express.js  
-PostgreSQL  
-Clean Architecture  
+## 📂 Project Structure Overview
+```yaml
+frontend/
+backend/
+README.md
+AGENT_WORKFLOW.md
+REFLECTION.md
+```
 
----
+## 🧠 Key Engineering Highlights
 
-## Compliance Statement
+- Clean Architecture implementation
 
-This implementation follows:
+- Domain-driven design approach
 
-FuelEU Annex I – Energy calculation methodology  
-FuelEU Annex II – Fuel energy constants  
-FuelEU Annex IV – Compliance balance formula  
-FuelEU Chapter 4 – Banking and pooling flexibility mechanisms  
+- Full-stack TypeScript usage
 
----
+- PostgreSQL relational modeling
 
-## Author
+- Regulatory logic implementation
 
-FuelEU Maritime Compliance Backend Implementation
+- Stateful banking and pooling system
+
+## ⚠ Known Limitations
+
+- No authentication system
+
+- No deployment configuration yet
+
+- Pool history persistence can be extended
+
+## 🔮 Future Improvements
+
+- User authentication and roles
+
+- Compliance reporting export
+
+- Cloud deployment
+
+- Automated test coverage
+
+- Dashboard analytics
+
+## 👨‍💻 Author
+
+Developed as part of FuelEU Maritime compliance simulation assignment.
