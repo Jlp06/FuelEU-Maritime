@@ -197,22 +197,15 @@ PostgreSQL
 
 ### Benefits of This Architecture
 
-Separation of concerns
-
-Testable business logic
-
-Maintainable structure
-
-Clear domain modeling
-
-Infrastructure independence
-
-### Benefits of this approach
+- Separation of concerns
 
 - Testable business logic
-- Clear separation of concerns
+
 - Maintainable structure
-- Extensible design
+
+- Clear domain modeling
+
+- Infrastructure independence
 
 ---
 
